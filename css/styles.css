@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* Box sizing rules */
 *,
 *::before,
@@ -99,23 +100,27 @@ body {
   margin: 0 auto;
   background-color: hsl(210, 46%, 95%);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 1rem;
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: 57.6923076923rem;
   background-color: hsl(0, 0%, 100%);
   border-radius: 0.6153846154rem;
   overflow: hidden;
+  z-index: 2;
 }
 
 .card-image {
   width: 100%;
   max-block-size: 15.3846153846rem;
+  border-radius: 0.6153846154rem;
   background-color: hsl(212, 23%, 69%);
   object-fit: cover;
 }
@@ -179,19 +184,52 @@ body {
   inline-size: 2.4615384615rem;
   block-size: 2.4615384615rem;
   cursor: pointer;
+  z-index: 1;
 }
-.card-footer .card-share:hover {
-  background-color: hsl(217, 19%, 35%);
+.card-footer .card-share img {
+  filter: none;
+  transition: filter 0.2s ease;
+}
+.card-footer .card-share.active {
+  background-color: hsl(214, 17%, 51%);
+}
+.card-footer .card-share.active img {
+  filter: brightness(0) saturate(100%) invert(100%);
 }
 
 .card-share-content {
-  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 3rem;
+  background-color: hsl(217, 19%, 35%);
+  border-radius: 0 0 0.6153846154rem 0.6153846154rem;
+  color: hsl(214, 17%, 51%);
+  letter-spacing: 0.5rem;
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  height: 72px;
+}
+.card-share-content.active {
+  transform: translateY(0%);
+  opacity: 1;
+  visibility: visible;
+}
+.card-share-content.active svg {
+  fill: hsl(0, 0%, 100%);
 }
 
 @media (min-width: 530px) {
   .card {
     display: grid;
     grid-template-columns: 1fr 2fr;
+    overflow: visible;
   }
   .card-image {
     width: 100%;
@@ -199,6 +237,44 @@ body {
     max-block-size: none;
     object-fit: cover;
     object-position: top left;
+  }
+  .card-share-content {
+    left: 93%;
+    bottom: 6.1538461538rem;
+    width: 20.7692307692rem;
+    justify-content: center;
+    padding: 0rem 2rem;
+    border-radius: 0.6153846154rem;
+    letter-spacing: 0.5rem;
+    background-color: hsl(217, 19%, 35%);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1;
+    position: absolute;
+    /* 
+      We want the tooltip just above the share button, hidden at first. 
+      “translateY(100%)” pushes it below its normal (bottom edge).
+    */
+    transform: translate(-50%, 100%);
+    transition: transform 0.25s ease, opacity 0.2s ease, visibility 0.2s ease;
+  }
+  .card-share-content::after {
+    content: "";
+    position: absolute;
+    bottom: -0.6153846154rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 0.6153846154rem solid transparent;
+    border-right: 0.6153846154rem solid transparent;
+    border-top: 0.6153846154rem solid hsl(217, 19%, 35%);
+    /* This triangle’s color must match the tooltip background */
+  }
+  .card-share-content.active {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    visibility: visible;
   }
 }
 

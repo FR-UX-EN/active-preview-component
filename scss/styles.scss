@@ -30,23 +30,27 @@ body {
   margin: 0 auto;
   background-color: $light-grayish-blue;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 1rem;
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: rem(750px);
   background-color: $white;
   border-radius: rem(8px);
   overflow: hidden;
+  z-index: 2;
 }
 
 .card-image {
   width: 100%;
   max-block-size: rem(200px);
+  border-radius: rem(8px);
   background-color: $grayish-blue;
   object-fit: cover;
 }
@@ -117,15 +121,52 @@ body {
     inline-size: rem(32px);
     block-size: rem(32px);
     cursor: pointer;
+    z-index: 1;
 
-    &:hover {
-      background-color: $very-dark-grayish-blue;
+    img {
+      // Ensure the original arrow is its normal (dark) version
+      filter: none;
+      transition: filter 0.2s ease;
+    }
+
+    &.active {
+      background-color: $desaturated-dark-blue;
+
+      img {
+        filter: brightness(0) saturate(100%) invert(100%);
+      }
     }
   }
 }
 
 .card-share-content {
-  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 3rem;
+  background-color: $very-dark-grayish-blue;
+  border-radius: 0 0 rem(8px) rem(8px);
+  color: $desaturated-dark-blue;
+  letter-spacing: 0.5rem;
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  height: 72px;
+
+  &.active {
+    transform: translateY(0%);
+    opacity: 1;
+    visibility: visible;
+
+    svg {
+      fill: $white;
+    }
+  }
 }
 
 // Media queries for responsive layout
@@ -133,6 +174,7 @@ body {
   .card {
     display: grid;
     grid-template-columns: 1fr 2fr;
+    overflow: visible;
   }
 
   .card-image {
@@ -141,5 +183,51 @@ body {
     max-block-size: none;
     object-fit: cover;
     object-position: top left;
+  }
+
+  .card-share-content {
+    left: 93%;
+    bottom: rem(80px);
+    width: rem(270px);
+    justify-content: center;
+    padding: 0rem 2rem;
+    border-radius: rem(8px);
+    letter-spacing: 0.5rem;
+    background-color: $very-dark-grayish-blue;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1;
+
+    // 2) Center horizontally above the share button:
+    position: absolute;
+    /* 
+      We want the tooltip just above the share button, hidden at first. 
+      “translateY(100%)” pushes it below its normal (bottom edge).
+    */
+    transform: translate(-50%, 100%);
+    transition: transform 0.25s ease, opacity 0.2s ease, visibility 0.2s ease;
+
+    // 3) Draw the little downward arrow using a pseudo‐element:
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: rem(-8px); // 6px below the tooltip’s bottom edge
+      left: 50%; // horizontally centered
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: rem(8px) solid transparent;
+      border-right: rem(8px) solid transparent;
+      border-top: rem(8px) solid $very-dark-grayish-blue;
+      /* This triangle’s color must match the tooltip background */
+    }
+
+    // 4) When “active,” slide the tooltip into view:
+    &.active {
+      transform: translate(-50%, 0);
+      // fully visible, aligned at its bottom edge
+      opacity: 1;
+      visibility: visible;
+    }
   }
 }
